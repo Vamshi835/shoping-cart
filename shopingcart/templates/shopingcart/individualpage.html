@@ -1,0 +1,123 @@
+{%extends "shopingcart/base.html"%}
+{%block title%}Book Page{%endblock%}
+{%block body%}
+<script type="text/javascript">
+	var Jsondata;
+	var cart_items;
+	var link;
+	function Response() {
+		link=window.location.toString();
+		link=link.split("/");
+		// console.log(window.location.toString()," ///// ",link);
+		$.ajax({
+			type: 'get',
+			url: '/shopingcart/jsondata/'+link[link.length-1],
+			dataType: 'json',
+			success: function(data)
+			{
+				Jsondata=data;
+				console.log(data," ///// ",typeof(data));
+    			document.getElementById("title").innerHTML =data.volumeInfo.title;
+			    document.getElementById("desc").innerHTML = data.volumeInfo.description;
+			    document.getElementById("bookpic").src = data.volumeInfo.imageLinks.thumbnail;
+			    document.getElementById("authors").innerHTML ="<b>Author : </b>"+data.volumeInfo.authors;
+			    document.getElementById("amt").innerHTML ="<b>Price : </b>"+ '&#8377; ' + amount(data);
+			    document.getElementById("publisher").innerHTML ="<b>Publisher : </b>"+data.volumeInfo.publisher;
+			    document.getElementById("dop").innerHTML = data.volumeInfo.publishedDate;
+			    document.getElementById('Cart').onclick=function(){cart(data)};
+			    document.getElementById('Buy').onclick=function(){cart(data)};
+			}
+		});
+	}
+	$(document).ready(function(){
+		Response();
+	});
+
+	function amount(data) {
+    var temp1 = "";
+    var str='';
+    if (data.saleInfo.listPrice)
+        temp1 = temp1 + data.saleInfo.listPrice.amount;
+    else {
+    	document.getElementById('Cart').disabled = true;
+		document.getElementById('Buy').disabled = true;
+		str+='<a href="'+data.volumeInfo.previewLink+'" class="btn btn-primary" target="_blank">More Info</a>'
+		document.getElementById("moreinfo").innerHTML =str ;
+        temp1 = temp1 + "Not available";
+    }
+    return temp1;
+}
+
+function cart(dat)
+{
+	var data={
+		'bookid':dat.id,
+		'name':dat.volumeInfo.title,
+		'index': link[link.length-1],
+		'price':amount(dat),
+		csrfmiddlewaretoken: $("input[name='csrfmiddlewaretoken']").val(),
+	};
+	console.log("In cart");
+	$.ajax({
+		type: 'post',
+		url: '/shopingcart/cart',
+		data:data,
+		success:function(data)
+		{
+			console.log(data,typeof(data));
+			document.getElementById("CART").innerHTML="CART("+data+")";	
+
+		}
+	});
+}
+
+
+</script>
+
+<div class="row">
+	<div class="col-md-5">
+		<div class="row">
+			<div class="col-md-5">
+				<img src="" width="100%" height="200px" id="bookpic">
+			</div>
+			<div class="col-md-7">
+					<div id="authors"></div>
+					<div id="publisher"></div>
+					<div id="amt"></div>
+					<div id="dop"></div>
+			</div>
+		</div>
+		<br>
+		<div class="row">
+			<div class="col-md-10">
+				<button class="btn btn-warning btn-block" id="Cart" >Add To Cart</button>	
+			</div>		
+		</div>
+		<br>
+		<div class="row">
+			<div class="col-md-10">
+				<button class="btn btn-warning btn-block" id="Buy">Buy Now</button>
+			</div>
+		</div>
+	</div>
+	<div class="col-md-7">
+		<div class="row">
+			<h1 id="title"></h1>
+		</div>
+		<div class="row">
+			<p id="desc"></p>
+		</div>
+		<div class="row" id="moreinfo">
+		</div>
+	</div>
+	
+
+<div class="hidden">
+     <form class="default_form">
+           {% csrf_token %}
+     </form>
+</div>
+
+
+</div>
+{%endblock%}

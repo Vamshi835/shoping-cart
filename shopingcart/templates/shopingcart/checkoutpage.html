@@ -1,0 +1,50 @@
+{%extends "shopingcart/base.html"%}
+{%block title%}Checkout Page{%endblock%}
+{%block body%}
+<script type="text/javascript">
+	var sum=0.0;
+</script>
+<table class="table">
+	<thead>
+		<th>Id</th>
+		<th>Name</th>
+		<th>Price</th>
+		<th>Quantity</th>
+		<th>Amount</th>
+	</thead>
+	<tbody>
+		{% for ch in checkout_list %}
+		<tr>
+		<td>{{forloop.counter}}</td>
+		<td>{{ch.BookName}}</td>
+		<td>{{ch.Price}}</td>
+		<td>{{ch.Quantity}}</td>
+		<td id="{{forloop.counter}}"></td>
+		</tr>
+		<script type="text/javascript">
+			var Price={{ch.Price}};
+			var q={{ch.Quantity}};
+			var amount=(Price*q);
+			sum+=amount;
+			amount=amount.toFixed(2);
+			document.getElementById("{{forloop.counter}}").innerHTML =amount+"";
+		</script>
+		{%endfor%}
+		<tr>
+			<td></td>
+			<td></td>
+			<td></td>
+
+			<td><b>Total</b></td>
+			<td id="total"></td>
+		</tr>
+		<script type="text/javascript">
+			sum=sum.toFixed(2);
+			document.getElementById("total").innerHTML=sum;
+		</script>
+	</tbody>
+</table>
+<div class="row" style="float:right;">
+	<a href="{% url 'shopingcart:placeorder'%}" class="btn btn-warning">Place Order</a>
+</div>
+{%endblock%}

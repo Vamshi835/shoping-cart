@@ -1,0 +1,33 @@
+{%extends "shopingcart/base.html"%}
+{%block title%}Cart Page{%endblock%}
+{%block body%}
+{% if data %}
+<div class="row" style="float: right;">
+	<a href="{% url 'shopingcart:checkout' %}" class="btn btn-warning">Checkout</a>
+</div>
+{% for item in data%}
+<div class="card w-75 card border-dark mb-3">
+  <div class="card-header">
+    <a href="/shopingcart/data/{{item.index}}">{{item.volumeInfo.title}}</a>
+  </div>
+  <div class="card-body">
+    <div class="row">
+    	<div class="col-md-4">
+    		<img src="{{item.volumeInfo.imageLinks.thumbnail}}">
+    	</div>
+    	<div class="col-md-8">
+    		<div class="row"><b>Price: </b> &#8377; {{item.saleInfo.listPrice.amount}}</div>
+    		<div class="row"><b>Quantity: </b> {{item.quantity}}</div>
+    		<div class="row"><b>Amount: </b> &#8377; {{item.amount}}</div>
+    	</div>
+    </div>
+    <div class="row" style="float: right;">
+    	<a href="/shopingcart/deleteitem/{{item.index}}" class="btn btn-danger btn-sm">Delete</a>
+    </div>
+  </div>
+</div>
+<br>
+{% endfor %}
+{% endif %}
+
+{%endblock%}

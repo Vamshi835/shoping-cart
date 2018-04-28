@@ -1,0 +1,109 @@
+{%extends "shopingcart/base.html"%}
+{%block title%}Home Page{%endblock%}
+{%block script%}
+<script type="text/javascript">
+	var Jsondata;
+	function getResponses() {
+		$.ajax({
+			type: 'get',
+			url: "{% url 'shopingcart:jsondata'%}",
+			dataType: 'json',
+			success:function(data){
+				Jsondata=data;
+				console.log("nnnn ",data,typeof(data)," ////// ","{% url 'shopingcart:jsondata'%}");
+				show(0,data);
+			}
+		});
+	}
+	$(document).ready(function(){
+		getResponses();
+	});
+</script>
+<script type="text/javascript">
+	var index=0;
+	var Data;
+	var arrays;
+	function display(a)
+	{
+		console.log(a," display");
+		var count=0,b=a+12;
+		if(b>=arrays.length)
+		{
+			b=arrays.length;
+		}
+		var str='<div class="row">';
+		for (var i = a; i <b; i++) {
+			count++;
+			str+='<div class="col-md-3">';
+			str+='<div class="card card border-dark mb-3" style="width: 15rem;">';
+  			str+='<img class="card-img-top" src="'+arrays[i].volumeInfo.imageLinks.thumbnail+'" alt="Card image cap" style="height:150px">';
+  			str+='<div class="card-body" id="Cards">'
+    		str+='<a href="/shopingcart/data/'+i+'"><h5 class="card-title">'+arrays[i].volumeInfo.title+'</h5></a>';
+  			str+='</div></div>';
+			str+='</div>';
+			if (count>=4) {
+				count=0;
+				str+='</div><br/>';
+				str+='<div class="row">';
+			}
+		}
+		str+='</div>'
+		document.getElementById("my").innerHTML =str;
+	}
+
+	function prev()
+    {
+      index-=12;
+      show(index,Data);
+
+    }
+    function next()
+    {
+      index+=12;
+      show(index,Data);
+    }
+    function show(i,data)
+    {
+    	Data=data;
+    	arrays=data.items;
+      var p=document.getElementById("prev");
+      var q=document.getElementById("next");
+      if(arrays.length<=12)
+      {
+      	p.style.display="none";
+        q.style.display="none";
+      }
+      else if(i<=0){
+        p.style.display="none";
+        q.style.display="block";
+      }
+      else if(i>=arrays.length-12){
+        q.style.display="none";
+        p.style.display="block";
+      }
+      else
+      {
+        q.style.display="block";
+        p.style.display="block";
+      }
+      display(index);
+      
+    }
+</script>
+
+
+{%endblock%}
+{%block body%}
+<div class="container">
+<div id="my"></div>
+<div class="row">
+	<div class="col-md-11">
+		<button class="btn btn-primary" id="prev" onclick="prev();">Prev</button>
+	</div>
+	<div class="col-md-1">
+		<button class="btn btn-primary" id="next" onclick="next();" style="float: right;">Next</button>
+	</div>
+</div>
+
+</div>
+{%endblock%}
